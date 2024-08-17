@@ -1,8 +1,24 @@
 import React from 'react';
-import { Card, CardContent, CardMedia, Typography, Button, CardActions } from '@mui/material';
+import { Card, CardContent, CardMedia, Typography, Button, CardActions, IconButton } from '@mui/material';
 import { Link } from 'react-router-dom';
+import FavoriteIcon from '@mui/icons-material/Favorite';
+import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
+import { useWishlist } from '../context/WishlistContext';
+import { useAuth } from '../context/AuthContext';
 
 const ProductCard = ({ id, title, image, price, description }) => {
+    const { wishlist, addToWishlist, removeFromWishlist } = useWishlist();
+    const { user } = useAuth();
+    const isInWishlist = wishlist.some(item => item.id === id);
+
+    const handleWishlistToggle = () => {
+        if (isInWishlist) {
+            removeFromWishlist(id);
+        } else {
+            addToWishlist({ id, title, image, price, description });
+        }
+    };
+
     return (
         <Card sx={{ maxWidth: 345, height: '100%', display: 'flex', flexDirection: 'column' }}>
             <CardMedia
@@ -25,6 +41,11 @@ const ProductCard = ({ id, title, image, price, description }) => {
             <CardActions>
                 <Button size="small" component={Link} to={`/product/${id}`}>Learn More</Button>
                 <Button size="small" color="primary">Add to Cart</Button>
+                {user && (
+                    <IconButton onClick={handleWishlistToggle} color="primary">
+                        {isInWishlist ? <FavoriteIcon /> : <FavoriteBorderIcon />}
+                    </IconButton>
+                )}
             </CardActions>
         </Card>
     );

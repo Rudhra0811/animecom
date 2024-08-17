@@ -8,7 +8,11 @@ import Home from './pages/Home';
 import ProductList from './pages/ProductList';
 import ProductDetail from './pages/ProductDetail';
 import Cart from './pages/Cart';
+import Login from './components/Login';
 import { CartProvider } from './context/CartContext';
+import { AuthProvider } from './context/AuthContext';
+import { WishlistProvider } from './context/WishlistContext';
+import './index.css';
 
 const theme = createTheme({
   palette: {
@@ -38,6 +42,23 @@ const theme = createTheme({
   },
 });
 
+function App() {
+  return (
+    <ThemeProvider theme={theme}>
+      <CssBaseline />
+      <AuthProvider>
+        <CartProvider>
+          <WishlistProvider>
+            <Router>
+              <AppContent />
+            </Router>
+          </WishlistProvider>
+        </CartProvider>
+      </AuthProvider>
+    </ThemeProvider>
+  );
+}
+
 function AppContent() {
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
@@ -52,23 +73,11 @@ function AppContent() {
           <Route path="/products" element={<ProductList initialSearch={searchTerm} />} />
           <Route path="/product/:id" element={<ProductDetail />} />
           <Route path="/cart" element={<Cart />} />
+          <Route path="/login" element={<Login />} />
         </Routes>
       </main>
       <Footer />
     </div>
-  );
-}
-
-function App() {
-  return (
-    <ThemeProvider theme={theme}>
-      <CssBaseline />
-      <CartProvider>
-        <Router>
-          <AppContent />
-        </Router>
-      </CartProvider>
-    </ThemeProvider>
   );
 }
 
