@@ -1,65 +1,42 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
 import { Container, Typography, Grid, Button, Box, Paper, TextField, Rating, Divider, List, ListItem, ListItemText } from '@mui/material';
-import { useCart } from '../context/CartContext';
-import { useAuth } from '../context/AuthContext';
+import { fetchPosterDetails, addReview } from '../store/productsSlice';
+import { addToCart } from '../store/cartSlice';
 import ReviewForm from '../components/ReviewForm';
 import RecommendationSection from '../components/RecommendationSection';
 import { motion, AnimatePresence } from 'framer-motion';
-import { api } from '../services/api';
 
-const ProductDetail = ({ setLoading }) => {
+const ProductDetail = () => {
     const { id } = useParams();
     const navigate = useNavigate();
-    const [product, setProduct] = useState(null);
-    const [quantity, setQuantity] = useState(1);
-    const { addToCart } = useCart();
-    const { user } = useAuth();
-    const [reviews, setReviews] = useState([]);
+    const dispatch = useDispatch();
+    const { currentPoster, status, error } = useSelector((state) => state.products);
+    const { user } = useSelector((state) => state.auth);
 
     useEffect(() => {
-        const fetchProduct = async () => {
-            setLoading(true);
-            try {
-                const data = await api.getPoster(id);
-                if (data) {
-                    setProduct(data);
-                    setReviews(data.reviews || []);
-                } else {
-                    navigate('/products');
-                }
-            } catch (error) {
-                console.error('Error fetching product:', error);
-                navigate('/products');
-            } finally {
-                setLoading(false);
-            }
-        };
+        dispatch(fetchPosterDetails(id));
+    }, [dispatch, id]);
 
-        fetchProduct();
-    }, [id, navigate, setLoading]);
-
-    const handleAddToCart = () => {
-        addToCart(product, quantity);
-        alert(`Added ${quantity} ${product.title} poster(s) to cart`);
+    const handleAddToCart = (quantity) => {
+        dispatch(addToCart({ ...currentPoster, quantity }));
+        alert(`Added ${quantity} ${currentPoster.title} poster(s) to cart`);
     };
 
-    const handleReviewSubmit = async (newReview) => {
-        try {
-            await api.addReview(id, newReview);
-            setReviews([...reviews, newReview]);
-        } catch (error) {
-            console.error('Error submitting review:', error);
-        }
+    const handleReviewSubmit = (review) => {
+        dispatch(addReview({ posterId: id, review }));
     };
 
-    if (!product) return null;
+    if (status === 'loading') return <Typography>Loading...</Typography>;
+    if (status === 'failed') return <Typography>Error: {error}</Typography>;
+    if (!currentPoster) return null;
 
     return (
         <Container maxWidth="lg" sx={{ mt: 4 }}>
             <AnimatePresence>
                 <motion.div
-                    key={product.id}
+                    key={currentPoster.id}
                     initial={{ opacity: 0, y: 50 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -50 }}
@@ -69,8 +46,8 @@ const ProductDetail = ({ setLoading }) => {
                         <Grid container spacing={4}>
                             <Grid item xs={12} md={6}>
                                 <motion.img
-                                    src={product.image}
-                                    alt={product.title}
+                                    src={currentPoster.image}
+                                    alt={currentPoster.title}
                                     style={{ width: '100%', height: 'auto' }}
                                     whileHover={{ scale: 1.05 }}
                                     transition={{ duration: 0.3 }}
@@ -78,27 +55,26 @@ const ProductDetail = ({ setLoading }) => {
                             </Grid>
                             <Grid item xs={12} md={6}>
                                 <Typography variant="h3" component="h1" gutterBottom>
-                                    {product.title}
+                                    {currentPoster.title}
                                 </Typography>
                                 <Typography variant="h4" color="primary" gutterBottom>
-                                    ${product.price.toFixed(2)}
+                                    ${currentPoster.price.toFixed(2)}
                                 </Typography>
                                 <Typography variant="body1" paragraph>
-                                    {product.description}
+                                    {currentPoster.description}
                                 </Typography>
                                 <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
                                     <TextField
                                         type="number"
                                         label="Quantity"
-                                        value={quantity}
-                                        onChange={(e) => setQuantity(Math.max(1, parseInt(e.target.value) || 1))}
+                                        defaultValue={1}
                                         InputProps={{ inputProps: { min: 1 } }}
                                         sx={{ width: 100, mr: 2 }}
                                     />
                                     <Button
                                         variant="contained"
                                         color="primary"
-                                        onClick={handleAddToCart}
+                                        onClick={() => handleAddToCart(1)}
                                         size="large"
                                     >
                                         Add to Cart
@@ -116,7 +92,7 @@ const ProductDetail = ({ setLoading }) => {
                             <Typography>Please log in to leave a review.</Typography>
                         )}
                         <List>
-                            {reviews.map((review, index) => (
+                            {currentPoster.reviews && currentPoster.reviews.map((review, index) => (
                                 <React.Fragment key={index}>
                                     <ListItem alignItems="flex-start">
                                         <ListItemText
@@ -131,13 +107,13 @@ const ProductDetail = ({ setLoading }) => {
                                             secondary={review.comment}
                                         />
                                     </ListItem>
-                                    {index < reviews.length - 1 && <Divider />}
+                                    {index < currentPoster.reviews.length - 1 && <Divider />}
                                 </React.Fragment>
                             ))}
                         </List>
                     </Box>
 
-                    <RecommendationSection currentPosterId={product.id} />
+                    <RecommendationSection currentPosterId={currentPoster.id} />
                 </motion.div>
             </AnimatePresence>
         </Container>
