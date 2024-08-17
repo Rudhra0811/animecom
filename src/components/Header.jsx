@@ -1,11 +1,21 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-import { AppBar, Toolbar, Typography, Button, IconButton, Badge } from '@mui/material';
+import React, { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { AppBar, Toolbar, Typography, Button, IconButton, Badge, Box } from '@mui/material';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import { useCart } from '../context/CartContext';
+import SearchBar from './SearchBar';
 
 const Header = () => {
     const { cart, cartTotal } = useCart();
+    const [searchTerm, setSearchTerm] = useState('');
+    const navigate = useNavigate();
+
+    const handleSearch = (e) => {
+        setSearchTerm(e.target.value);
+        if (e.key === 'Enter') {
+            navigate(`/products?search=${encodeURIComponent(searchTerm)}`);
+        }
+    };
 
     return (
         <AppBar position="static">
@@ -15,6 +25,9 @@ const Header = () => {
                         Anime Poster Marketplace
                     </Link>
                 </Typography>
+                <Box sx={{ flexGrow: 1, display: 'flex', justifyContent: 'center' }}>
+                    <SearchBar value={searchTerm} onChange={handleSearch} />
+                </Box>
                 <Button color="inherit" component={Link} to="/products">
                     Products
                 </Button>

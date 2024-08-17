@@ -40,5 +40,47 @@ export const mockPosters = [
         image: "https://via.placeholder.com/300x450.png?text=Death+Note",
         price: 20.99,
         description: "Mysterious poster showcasing Light and L from Death Note."
+    },
+    {
+        id: 7,
+        title: "Fullmetal Alchemist",
+        image: "https://via.placeholder.com/300x450.png?text=Fullmetal+Alchemist",
+        price: 25.99,
+        description: "Epic poster featuring the Elric brothers from Fullmetal Alchemist."
+    },
+    {
+        id: 8,
+        title: "Dragon Ball Z",
+        image: "https://via.placeholder.com/300x450.png?text=Dragon+Ball+Z",
+        price: 22.99,
+        description: "Action-packed poster showcasing the iconic characters from Dragon Ball Z."
+    },
+    {
+        id: 9,
+        title: "Hunter x Hunter",
+        image: "https://via.placeholder.com/300x450.png?text=Hunter+x+Hunter",
+        price: 23.99,
+        description: "Adventurous poster featuring Gon and his friends from Hunter x Hunter."
+    },
+    {
+        id: 10,
+        title: "Steins;Gate",
+        image: "https://via.placeholder.com/300x450.png?text=Steins;Gate",
+        price: 21.99,
+        description: "Mind-bending poster showcasing the characters from Steins;Gate."
+    },
+    {
+        id: 11,
+        title: "Cowboy Bebop",
+        image: "https://via.placeholder.com/300x450.png?text=Cowboy+Bebop",
+        price: 24.99,
+        description: "Stylish poster featuring the crew of the Bebop from Cowboy Bebop."
+    },
+    {
+        id: 12,
+        title: "Tokyo Ghoul",
+        image: "https://via.placeholder.com/300x450.png?text=Tokyo+Ghoul",
+        price: 20.99,
+        description: "Dark and mysterious poster showcasing Ken Kaneki from Tokyo Ghoul."
     }
 ];
