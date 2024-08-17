@@ -7,6 +7,7 @@ import Footer from './components/Footer';
 import Home from './pages/Home';
 import ProductList from './pages/ProductList';
 import ProductDetail from './pages/ProductDetail';
+import { CartProvider } from './context/CartContext';
 
 const theme = createTheme({
   palette: {
@@ -40,19 +41,21 @@ function App() {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <Router>
-        <div className="App">
-          <Header />
-          <main>
-            <Routes>
-              <Route path="/" element={<Home />} />
-              <Route path="/products" element={<ProductList />} />
-              <Route path="/product/:id" element={<ProductDetail />} />
-            </Routes>
-          </main>
-          <Footer />
-        </div>
-      </Router>
+      <CartProvider>
+        <Router>
+          <div className="App">
+            <Header />
+            <main>
+              <Routes>
+                <Route path="/" element={<Home />} />
+                <Route path="/products" element={<ProductList />} />
+                <Route path="/product/:id" element={<ProductDetail />} />
+              </Routes>
+            </main>
+            <Footer />
+          </div>
+        </Router>
+      </CartProvider>
     </ThemeProvider>
   );
 }
