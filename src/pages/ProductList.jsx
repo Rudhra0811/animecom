@@ -1,55 +1,70 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Typography, Grid, TextField, Pagination, Box } from '@mui/material';
+import { Container, Typography, Grid, Box } from '@mui/material';
 import ProductCard from '../components/ProductCard';
-import { mockPosters } from '../data/mockPosters';
+import SearchBar from '../components/SearchBar';
+import { motion, AnimatePresence } from 'framer-motion';
+import { api } from '../services/api';
 
-const ProductList = () => {
-    const [searchTerm, setSearchTerm] = useState('');
-    const [currentPage, setCurrentPage] = useState(1);
-    const [filteredPosters, setFilteredPosters] = useState([]);
-    const postersPerPage = 6;
+const ProductList = ({ initialSearch, setLoading }) => {
+    const [searchTerm, setSearchTerm] = useState(initialSearch);
+    const [posters, setPosters] = useState([]);
 
     useEffect(() => {
-        const results = mockPosters.filter(poster =>
-            poster.title.toLowerCase().includes(searchTerm.toLowerCase())
-        );
-        setFilteredPosters(results);
-        setCurrentPage(1);
-    }, [searchTerm]);
+        const fetchPosters = async () => {
+            setLoading(true);
+            try {
+                const data = await api.getPosters(searchTerm);
+                setPosters(data);
+            } catch (error) {
+                console.error('Error fetching posters:', error);
+            } finally {
+                setLoading(false);
+            }
+        };
 
-    const indexOfLastPoster = currentPage * postersPerPage;
-    const indexOfFirstPoster = indexOfLastPoster - postersPerPage;
-    const currentPosters = filteredPosters.slice(indexOfFirstPoster, indexOfLastPoster);
+        fetchPosters();
+    }, [searchTerm, setLoading]);
 
-    const paginate = (event, value) => setCurrentPage(value);
+    const handleSearch = (value) => {
+        setSearchTerm(value);
+    };
 
     return (
         <Container maxWidth="lg" sx={{ mt: 4 }}>
             <Typography variant="h3" component="h1" gutterBottom>
                 Anime Posters
             </Typography>
-            <TextField
-                fullWidth
-                label="Search posters"
-                variant="outlined"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                sx={{ mb: 4 }}
-            />
-            <Grid container spacing={3}>
-                {currentPosters.map((poster) => (
-                    <Grid item key={poster.id} xs={12} sm={6} md={4}>
-                        <ProductCard {...poster} />
-                    </Grid>
-                ))}
-            </Grid>
-            <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
-                <Pagination
-                    count={Math.ceil(filteredPosters.length / postersPerPage)}
-                    page={currentPage}
-                    onChange={paginate}
-                    color="primary"
-                />
+            <SearchBar value={searchTerm} onChange={handleSearch} />
+            <Box sx={{ mt: 4 }}>
+                <AnimatePresence>
+                    <motion.div
+                        initial="hidden"
+                        animate="visible"
+                        exit="hidden"
+                        variants={{
+                            hidden: { opacity: 0 },
+                            visible: {
+                                opacity: 1,
+                                transition: { staggerChildren: 0.1 }
+                            }
+                        }}
+                    >
+                        <Grid container spacing={3}>
+                            {posters.map((poster) => (
+                                <Grid item key={poster.id} xs={12} sm={6} md={4}>
+                                    <motion.div
+                                        variants={{
+                                            hidden: { y: 20, opacity: 0 },
+                                            visible: { y: 0, opacity: 1 }
+                                        }}
+                                    >
+                                        <ProductCard {...poster} />
+                                    </motion.div>
+                                </Grid>
+                            ))}
+                        </Grid>
+                    </motion.div>
+                </AnimatePresence>
             </Box>
         </Container>
     );
