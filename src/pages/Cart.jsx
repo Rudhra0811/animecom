@@ -1,24 +1,39 @@
 import React from 'react';
-import { useCart } from '../context/CartContext';
+import { useSelector, useDispatch } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 import { Container, Typography, Grid, Paper, Button, IconButton, Box } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import RemoveIcon from '@mui/icons-material/Remove';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { Link } from 'react-router-dom';
+import { addToCart, removeFromCart, clearCart } from '../store/cartSlice';
 
 const Cart = () => {
-    const { cart, addToCart, removeFromCart, clearCart, cartTotal } = useCart();
+    const cart = useSelector((state) => state.cart);
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
 
     const handleIncreaseQuantity = (item) => {
-        addToCart(item, 1);
+        dispatch(addToCart({ ...item, quantity: 1 }));
     };
 
     const handleDecreaseQuantity = (item) => {
         if (item.quantity > 1) {
-            addToCart(item, -1);
+            dispatch(addToCart({ ...item, quantity: -1 }));
         } else {
-            removeFromCart(item.id);
+            dispatch(removeFromCart(item.id));
         }
+    };
+
+    const handleRemoveItem = (itemId) => {
+        dispatch(removeFromCart(itemId));
+    };
+
+    const handleClearCart = () => {
+        dispatch(clearCart());
+    };
+
+    const handleCheckout = () => {
+        navigate('/checkout');
     };
 
     return (
@@ -26,11 +41,11 @@ const Cart = () => {
             <Typography variant="h3" component="h1" gutterBottom>
                 Your Cart
             </Typography>
-            {cart.length === 0 ? (
+            {cart.items.length === 0 ? (
                 <Typography variant="h5">Your cart is empty</Typography>
             ) : (
                 <>
-                    {cart.map((item) => (
+                    {cart.items.map((item) => (
                         <Paper key={item.id} elevation={3} sx={{ mb: 2, p: 2 }}>
                             <Grid container alignItems="center" spacing={2}>
                                 <Grid item xs={12} sm={3}>
@@ -57,7 +72,7 @@ const Cart = () => {
                                     </Typography>
                                 </Grid>
                                 <Grid item xs={12} sm={1}>
-                                    <IconButton onClick={() => removeFromCart(item.id)} color="error">
+                                    <IconButton onClick={() => handleRemoveItem(item.id)} color="error">
                                         <DeleteIcon />
                                     </IconButton>
                                 </Grid>
@@ -66,13 +81,13 @@ const Cart = () => {
                     ))}
                     <Box sx={{ mt: 4, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                         <Typography variant="h4">
-                            Total: ${cartTotal.toFixed(2)}
+                            Total: ${cart.total.toFixed(2)}
                         </Typography>
                         <Box>
-                            <Button variant="outlined" color="secondary" onClick={clearCart} sx={{ mr: 2 }}>
+                            <Button variant="outlined" color="secondary" onClick={handleClearCart} sx={{ mr: 2 }}>
                                 Clear Cart
                             </Button>
-                            <Button variant="contained" color="primary" component={Link} to="/checkout">
+                            <Button variant="contained" color="primary" onClick={handleCheckout}>
                                 Proceed to Checkout
                             </Button>
                         </Box>

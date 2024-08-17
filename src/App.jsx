@@ -3,19 +3,19 @@ import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import { Provider } from 'react-redux';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
-import { LinearProgress } from '@mui/material';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import Home from './pages/Home';
 import ProductList from './pages/ProductList';
 import ProductDetail from './pages/ProductDetail';
 import Cart from './pages/Cart';
+import Checkout from './pages/Checkout';
+import OrderConfirmation from './pages/OrderConfirmation';
 import Login from './components/Login';
 import Registration from './components/Registration';
 import UserProfile from './components/UserProfile';
 import WishlistPage from './pages/WishlistPage';
 import { store } from './store';
-import './index.css';
 
 const theme = createTheme({
   // ... (keep the existing theme configuration)
@@ -35,6 +35,8 @@ function App() {
                 <Route path="/products" element={<ProductList />} />
                 <Route path="/product/:id" element={<ProductDetail />} />
                 <Route path="/cart" element={<Cart />} />
+                <Route path="/checkout" element={<Checkout />} />
+                <Route path="/order-confirmation" element={<OrderConfirmation />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Registration />} />
                 <Route path="/profile" element={<UserProfile />} />
