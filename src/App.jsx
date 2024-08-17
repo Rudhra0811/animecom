@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { BrowserRouter as Router, Route, Routes, useLocation } from 'react-router-dom';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
+import { LinearProgress } from '@mui/material';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import Home from './pages/Home';
@@ -45,6 +46,8 @@ const theme = createTheme({
 });
 
 function App() {
+  const [loading, setLoading] = useState(false);
+
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
@@ -52,7 +55,7 @@ function App() {
         <CartProvider>
           <WishlistProvider>
             <Router>
-              <AppContent />
+              <AppContent loading={loading} setLoading={setLoading} />
             </Router>
           </WishlistProvider>
         </CartProvider>
@@ -61,7 +64,7 @@ function App() {
   );
 }
 
-function AppContent() {
+function AppContent({ loading, setLoading }) {
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
   const searchTerm = searchParams.get('search') || '';
@@ -69,16 +72,17 @@ function AppContent() {
   return (
     <div className="App">
       <Header />
+      {loading && <LinearProgress />}
       <main>
         <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/products" element={<ProductList initialSearch={searchTerm} />} />
-          <Route path="/product/:id" element={<ProductDetail />} />
-          <Route path="/cart" element={<Cart />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Registration />} />
-          <Route path="/profile" element={<UserProfile />} />
-          <Route path="/wishlist" element={<WishlistPage />} />
+          <Route path="/" element={<Home setLoading={setLoading} />} />
+          <Route path="/products" element={<ProductList initialSearch={searchTerm} setLoading={setLoading} />} />
+          <Route path="/product/:id" element={<ProductDetail setLoading={setLoading} />} />
+          <Route path="/cart" element={<Cart setLoading={setLoading} />} />
+          <Route path="/login" element={<Login setLoading={setLoading} />} />
+          <Route path="/register" element={<Registration setLoading={setLoading} />} />
+          <Route path="/profile" element={<UserProfile setLoading={setLoading} />} />
+          <Route path="/wishlist" element={<WishlistPage setLoading={setLoading} />} />
         </Routes>
       </main>
       <Footer />

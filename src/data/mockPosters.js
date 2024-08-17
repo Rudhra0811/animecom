@@ -4,7 +4,11 @@ export const mockPosters = [
         title: "Attack on Titan",
         image: "https://via.placeholder.com/300x450.png?text=Attack+on+Titan",
         price: 24.99,
-        description: "Epic poster featuring the main characters from Attack on Titan."
+        description: "Epic poster featuring the main characters from Attack on Titan.",
+        reviews: [
+            { user: "anime_fan", rating: 5, comment: "Amazing poster! The detail is incredible." },
+            { user: "titan_slayer", rating: 4, comment: "Great quality, but wish it was a bit larger." }
+        ]
     },
     {
         id: 2,
